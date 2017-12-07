@@ -1,0 +1,1 @@
+{"amount":"99996180","txid":"62c354d78a2c02f83db492ce62773d0556df8c4cc4abaf8eabfff9dac48b6ca9","time":"2017-12-05 16:13:07 GMT","confidence":"building","peers":0,"confirmations":2609,"inputs":[{"address":"mqG1UwyKD5yPBarzthhakK77tahPA3zAbV","amount":"100000000"}],"outputs":[{"address":"mvAAc7z2JD8YoNNCfqmKgHyewfz3hMm6C5","type":"external","amount":"99996180"}]}
