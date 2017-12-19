@@ -134,14 +134,16 @@ public class BTCTest {
 					System.out.println("Token recebido...");
 					System.out.println("Processando permissão...");
 					while (tokenText.equals("") && txParent != null) {
-						System.out.println("Oi!");
-						
+						// System.out.println("Oi!");
+
 						if (txParent.getOutputs().size() > 1) {
 							tokenText = retrieveToken(txParent.getHashAsString(), wallet);
-							System.out.println("Token = " + tokenText);
-							if (tokens.contains(tokenText) &&  txParent.getValueSentFromMe(wallet).compareTo(Coin.parseCoin("1") )==1) {
+							// System.out.println("Token = " + tokenText);
+							Address fromAddress = new Address(networkParameters,Utils.sha256hash160(txParent.getInput(0).getScriptSig().getPubKey()));
+							if (tokens.contains(tokenText)
+									&& isAddressMine(networkParameters, wallet, fromAddress)) {
 								tokens.remove(tokenText);
-								System.out.println(tokenText);
+								System.out.println("Token = " + tokenText);
 								System.out.println("Aceeso permitido");
 								output.high();
 								if (output.isHigh()) {
@@ -149,7 +151,7 @@ public class BTCTest {
 									// Logger.getLogger(BTCTest.class.getName()).log(Level.INFO, "High");
 								}
 								System.out.println("Pressione qualquer tecla para acessar.");
-								new Scanner(System.in).next();
+								new Scanner(System.in).nextLine();
 								output.low();
 								if (output.isLow()) {
 									System.out.println("Low");
@@ -162,10 +164,9 @@ public class BTCTest {
 							txParent = txParent.getInputs().get(0).getConnectedOutput().getParentTransaction();
 						}
 					}
-					
-					
+
 					System.out.println("*************");
-				}else {
+				} else {
 					System.out.println(tx.getValueSentToMe(wallet).toFriendlyString() + "recebidos");
 				}
 			}
@@ -180,19 +181,18 @@ public class BTCTest {
 		InetSocketAddress address = new InetSocketAddress("192.168.1.220", 18444);
 		PeerAddress add = new PeerAddress(address);
 
-		InetSocketAddress address2 = new InetSocketAddress("127.0.0.1", 18444);
+		InetSocketAddress address2 = new InetSocketAddress("192.168.1.209", 18444);
 		PeerAddress add2 = new PeerAddress(address2);
 
 		peerGroup.setUseLocalhostPeerWhenPossible(false);
 
 		peerGroup.start();
 
-		 peerGroup.connectToLocalHost();
+		// peerGroup.connectToLocalHost();
 		// peerGroup.connectTo(address);
-		//peerGroup.addAddress(add);
-		//peerGroup.addAddress(add2);
+		peerGroup.addAddress(add);
+		peerGroup.addAddress(add2);
 
-		
 		System.out.println("Started");
 		peerGroup.downloadBlockChain();
 
@@ -297,23 +297,23 @@ public class BTCTest {
 					System.out.println(s);
 				}
 				break;
-//			case 7:
-//				output.high();
-//				if (output.isHigh()) {
-//					// System.out.println("High");
-//					Logger.getLogger(BTCTest.class.getName()).log(Level.INFO, "High");
-//				}
-//				break;
-//			case 8:
-//				output.low();
-//				if (output.isLow()) {
-//					// System.out.println("Low");
-//					Logger.getLogger(BTCTest.class.getName()).log(Level.INFO, "Low");
-//				}
-//				break;
-//			case 9:
-//				System.out.println(output.getState());
-//				break;
+			// case 7:
+			// output.high();
+			// if (output.isHigh()) {
+			// // System.out.println("High");
+			// Logger.getLogger(BTCTest.class.getName()).log(Level.INFO, "High");
+			// }
+			// break;
+			// case 8:
+			// output.low();
+			// if (output.isLow()) {
+			// // System.out.println("Low");
+			// Logger.getLogger(BTCTest.class.getName()).log(Level.INFO, "Low");
+			// }
+			// break;
+			// case 9:
+			// System.out.println(output.getState());
+			// break;
 			case 0: {
 				try {
 					BufferedWriter fw = new BufferedWriter(new FileWriter("UnusedTokens.dat"));
@@ -385,8 +385,8 @@ public class BTCTest {
 		List<TransactionOutput> unspent = wallet.getUnspents();
 		for (TransactionOutput previousOutput : unspent) {
 			if (previousOutput.getValue().isGreaterThan(Coin.parseCoin("1"))) {
-				tx.addSignedInput(previousOutput,wallet.currentKey(KeyChain.KeyPurpose.AUTHENTICATION));
-				
+				tx.addSignedInput(previousOutput, wallet.currentKey(KeyChain.KeyPurpose.AUTHENTICATION));
+
 				break;
 			}
 		}
@@ -460,7 +460,6 @@ public class BTCTest {
 
 		for (TransactionInput input : tx.getInputs()) {
 			JSONObject inputData = new JSONObject();
-
 			if (!input.isCoinBase()) {
 				try {
 					Script scriptSig = input.getScriptSig();
@@ -491,7 +490,7 @@ public class BTCTest {
 					Address toAddress = scriptPubKey.getToAddress(networkParams);
 					outputData.put("address", toAddress);
 
-					if (toAddress.toString().equals(getWalletAddress(networkParams, wallet))) {
+					if (isAddressMine(networkParams, wallet, toAddress)) {
 						outputData.put("type", "own");
 					} else {
 						outputData.put("type", "external");
@@ -500,13 +499,15 @@ public class BTCTest {
 					outputData.put("type", "pubkey");
 				} else if (scriptPubKey.isSentToMultiSig()) {
 					outputData.put("type", "multisig");
+				} else if (scriptPubKey.isOpReturn()) {
+					outputData.put("type", "op_retrun");
 				} else {
 					outputData.put("type", "unknown");
 				}
 			} catch (ScriptException e) {
 				// can't parse script, give up
 			}
-
+			
 			outputData.put("amount", output.getValue());
 			outputs.put(outputData);
 		}
@@ -547,4 +548,14 @@ public class BTCTest {
 		return Addres;
 	}
 
+	private static Boolean isAddressMine(NetworkParameters nt, Wallet wallet, Address address) {
+
+		List<ECKey> key_list = wallet.getIssuedReceiveKeys();
+
+		for (ECKey ec : key_list) {
+			if (ec.toAddress(nt).toBase58().equals(address.toBase58()))
+				return true;
+		}
+		return false;
+	}
 }

@@ -1,1 +1,21 @@
-{"amount":"99996160","txid":"d5c3c46227a0dc3dfb4df9b63b3c9552c005f450b6460057e730174a54f8b807","time":"2017-10-31 17:53:16 GMT","confidence":"building","peers":0,"confirmations":4617,"inputs":[{"address":"mqG1UwyKD5yPBarzthhakK77tahPA3zAbV","amount":"100000000"}],"outputs":[{"address":"mpFKGfPLxcg9Ya32UX9j8Vu1waTpJnmQ58","type":"external","amount":"99996160"}]}
+{
+"amount":"99996160",
+"txid":"d5c3c46227a0dc3dfb4df9b63b3c9552c005f450b6460057e730174a54f8b807",
+"time":"2017-10-31 17:53:16 GMT",
+"confidence":"building",
+"peers":0,
+"confirmations":4617,
+"inputs":[
+	{
+		"address":"mqG1UwyKD5yPBarzthhakK77tahPA3zAbV",
+		"amount":"100000000"
+	}
+],
+"outputs":[
+	{
+		"address":"mpFKGfPLxcg9Ya32UX9j8Vu1waTpJnmQ58",
+		"type":"external",
+		"amount":"99996160"
+	}
+		]
+}

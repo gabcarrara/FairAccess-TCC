@@ -1,0 +1,21 @@
+{
+	"amount":"99996160",
+	"txid":"b6eb43d3fd67456c391ce6174cd47f7a8fc3e9c6bb80e875c73a26b280a21427",
+	"time":"2017-12-19 15:49:46 GMT",
+	"confidence":"pending",
+	"peers":2,
+	"confirmations":0,
+	"inputs":[
+		{
+			"address":"mqG1UwyKD5yPBarzthhakK77tahPA3zAbV",
+			"amount":"100000000"
+		}
+	],
+	"outputs":[
+		{
+			"address":"n4KBMUq9qCDjALiv4NxgZF5qQijM83akxC",
+			"type":"own",
+			"amount":"99996160"
+		}
+	]
+}
