@@ -79,6 +79,7 @@ public class BTCTest {
 	 * @throws org.bitcoinj.store.BlockStoreException
 	 */
 	public static void main(String[] args) throws BlockStoreException {
+		
 		final GpioController gpio = GpioFactory.getInstance();
 
 		final GpioPinDigitalOutput output = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01, PinState.LOW);
